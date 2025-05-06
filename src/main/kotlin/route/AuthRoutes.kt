@@ -3,6 +3,7 @@ package route
 import config.MyWorkoutSecurity
 import di.Component
 import dto.auth.LoginRequestDto
+import dto.auth.PasswordChangeRequestDto
 import dto.auth.RegisterRequestDto
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -21,6 +22,7 @@ fun Application.configureAuthRoutes() {
             configureRegister(authService)
             configureCheckToken()
             configureLogin(authService)
+            configureChangePassword(authService)
         }
     }
 }
@@ -47,5 +49,15 @@ private fun Route.configureLogin(authService: AuthService) {
     post("/login") {
         val loginRequestDto = call.receive<LoginRequestDto>()
         authService.login(loginRequestDto)?.let { call.respond(it) } ?: call.respond(HttpStatusCode.Unauthorized)
+    }
+}
+
+//маршрут для смены пароля
+private fun Route.configureChangePassword(authService: AuthService) {
+    post("/change-password") {
+        val passwordChangeRequestDto = call.receive<PasswordChangeRequestDto>()
+        authService.changePassword(passwordChangeRequestDto)?.let {
+            call.respond(it)
+        } ?: call.respond(HttpStatusCode.Unauthorized)
     }
 }
