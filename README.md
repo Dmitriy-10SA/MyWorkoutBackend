@@ -1,6 +1,6 @@
 # Backend for [MyWorkout](https://github.com/Dmitriy-10SA/MyWorkout) app (бэкенд для приложения [MyWorkout](https://github.com/Dmitriy-10SA/MyWorkout))
 
-# Stack(стек): Kotlin + Ktor
+# Stack(стек): Kotlin + Ktor + PostgreSQL
 
 ## Features
 
