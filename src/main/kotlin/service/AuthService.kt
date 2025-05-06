@@ -28,14 +28,7 @@ class AuthService(
         val password = loginRequestDto.password
         val user = authRepository.getUserInfoOrNullByMail(mail)
         return if (user != null && PasswordHasher.verify(password, user.password)) {
-            AuthResponseDto(
-                token = JWT
-                    .create()
-                    .withAudience(MyWorkoutSecurity.USER_AUDIENCE)
-                    .withIssuer(MyWorkoutSecurity.ISSUER)
-                    .withClaim(MyWorkoutSecurity.ID_CLAIM, authRepository.getUserInfoByMail(mail).id)
-                    .sign(MyWorkoutSecurity.ALGORITHM)
-            )
+            AuthResponseDto(token = generateUserToken(authRepository.getUserInfoByMail(mail).id))
         } else {
             null
         }
@@ -53,16 +46,16 @@ class AuthService(
         authRepository.registerUser(mail, PasswordHasher.hash(password), surname, name, patronymic)
         val newUser = authRepository.getUserInfoOrNullByMail(mail)
         return if (newUser != null) {
-            AuthResponseDto(
-                token = JWT
-                    .create()
-                    .withAudience(MyWorkoutSecurity.USER_AUDIENCE)
-                    .withIssuer(MyWorkoutSecurity.ISSUER)
-                    .withClaim(MyWorkoutSecurity.ID_CLAIM, authRepository.getUserInfoByMail(mail).id)
-                    .sign(MyWorkoutSecurity.ALGORITHM)
-            )
+            AuthResponseDto(token = generateUserToken(authRepository.getUserInfoByMail(mail).id))
         } else {
             null
         }
     }
+
+    private fun generateUserToken(userId: Int) = JWT
+        .create()
+        .withAudience(MyWorkoutSecurity.USER_AUDIENCE)
+        .withIssuer(MyWorkoutSecurity.ISSUER)
+        .withClaim(MyWorkoutSecurity.ID_CLAIM, userId)
+        .sign(MyWorkoutSecurity.ALGORITHM)
 }
