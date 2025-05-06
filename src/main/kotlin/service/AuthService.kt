@@ -5,6 +5,7 @@ import config.MyWorkoutSecurity
 import config.PasswordHasher
 import dto.auth.AuthResponseDto
 import dto.auth.LoginRequestDto
+import dto.auth.PasswordChangeRequestDto
 import dto.auth.RegisterRequestDto
 import repository.auth.AuthRepository
 
@@ -13,6 +14,7 @@ import repository.auth.AuthRepository
  *
  * @property login вход
  * @property register регистрация
+ * @property changePassword смена пароля
  *
  * @see AuthRepository
  * @see LoginRequestDto
@@ -28,7 +30,7 @@ class AuthService(
         val password = loginRequestDto.password
         val user = authRepository.getUserInfoOrNullByMail(mail)
         return if (user != null && PasswordHasher.verify(password, user.password)) {
-            AuthResponseDto(token = generateUserToken(authRepository.getUserInfoByMail(mail).id))
+            AuthResponseDto(token = generateUserToken(user.id))
         } else {
             null
         }
@@ -46,7 +48,19 @@ class AuthService(
         authRepository.registerUser(mail, PasswordHasher.hash(password), surname, name, patronymic)
         val newUser = authRepository.getUserInfoOrNullByMail(mail)
         return if (newUser != null) {
-            AuthResponseDto(token = generateUserToken(authRepository.getUserInfoByMail(mail).id))
+            AuthResponseDto(token = generateUserToken(newUser.id))
+        } else {
+            null
+        }
+    }
+
+    fun changePassword(passwordChangeRequestDto: PasswordChangeRequestDto): AuthResponseDto? {
+        val mail = passwordChangeRequestDto.mail
+        val password = passwordChangeRequestDto.password
+        val user = authRepository.getUserInfoOrNullByMail(mail)
+        return if (user != null) {
+            authRepository.changePassword(user.id, PasswordHasher.hash(password))
+            AuthResponseDto(token = generateUserToken(user.id))
         } else {
             null
         }

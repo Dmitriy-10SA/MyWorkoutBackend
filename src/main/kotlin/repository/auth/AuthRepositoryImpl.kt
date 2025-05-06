@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 /**
  * @property registerUser регистрация пользователя
@@ -16,6 +17,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
  * @property getUserInfo получение информации о пользователе по условию
  * @property getUserInfoOrNull получение информации о пользователе по условию (возможен null)
  * @property mapToUserInfoDto перевод полученной строки из таблицы в UserInfoDto
+ * @property changePassword смена пароля
  *
  * @see AuthRepository
  * @see UserInfoDto
@@ -38,6 +40,14 @@ class AuthRepositoryImpl : AuthRepository {
     override fun getUserInfoOrNullByMail(mail: String) = getUserInfoOrNull(User.mail eq mail)
 
     override fun getUserInfoById(id: Int) = getUserInfo(User.id eq id)
+
+    override fun changePassword(userId: Int, password: String) {
+        return transaction {
+            User.update( { User.id eq userId} ) {
+                it[User.password] = password
+            }
+        }
+    }
 
     private fun getUserInfo(predicate: Op<Boolean>) = transaction {
         User.selectAll().where(predicate).single().mapToUserInfoDto()

@@ -7,6 +7,7 @@ import dto.common.UserInfoDto
  * @property getUserInfoById получение пользователя по id
  * @property getUserInfoByMail получение пользователя по mail
  * @property getUserInfoOrNullByMail получение пользователя по mail (или null)
+ * @property changePassword смена пароля
  *
  * @see AuthRepositoryImpl
  */
@@ -15,4 +16,5 @@ interface AuthRepository {
     fun getUserInfoByMail(mail: String): UserInfoDto
     fun getUserInfoById(id: Int): UserInfoDto
     fun getUserInfoOrNullByMail(mail: String): UserInfoDto?
+    fun changePassword(userId: Int, password: String)
 }
